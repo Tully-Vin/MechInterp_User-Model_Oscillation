@@ -1,1 +1,6 @@
 Submission_docs/
+.venv/
+venv/
+__pycache__/
+data/raw/
+data/probe/

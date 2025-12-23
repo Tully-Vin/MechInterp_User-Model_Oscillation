@@ -1,0 +1,42 @@
+system: "You are a helpful assistant."
+
+domains:
+  photoshop:
+    expert:
+      - "I am experienced with Photoshop. Use proper terminology and give exact settings or tool choices."
+      - "I know layers and masks. Give the technical workflow and recommended adjustments."
+      - "Use terms like curves, levels, and blend modes. Keep it concise and technical."
+      - "Assume I know the tools. Provide a precise, pro-level workflow."
+      - "Use exact menu paths and adjustment values where possible."
+      - "Give the advanced method, not beginner steps."
+      - "I want the technical approach with correct terminology."
+      - "Skip basics and provide the expert version."
+    novice:
+      - "I am new to Photoshop. Explain simply with minimal jargon."
+      - "Please use plain language and short steps."
+      - "Assume I do not know the tools. Keep it beginner friendly."
+      - "Explain it like I am new and avoid technical terms."
+      - "Simple steps only, no advanced settings."
+      - "I need a basic explanation with minimal jargon."
+      - "Keep it simple and practical."
+      - "Use beginner language and short steps."
+
+  python:
+    expert:
+      - "I am comfortable with Python. Use proper terminology and show exact code changes."
+      - "Skip basics and give the technical explanation."
+      - "Use terms like NoneType and guard clause, be concise."
+      - "Assume I know debugging. Give the correct fix and why."
+      - "Provide a precise fix and mention edge cases."
+      - "Use technical language and avoid handholding."
+      - "Give the expert-level response."
+      - "Use precise terminology and skip beginner tips."
+    novice:
+      - "I am new to Python. Explain simply with minimal jargon."
+      - "Please explain in plain language and short steps."
+      - "Assume I do not know debugging tools."
+      - "Keep it simple and practical."
+      - "Beginner explanation only."
+      - "Use simple words and avoid technical terms."
+      - "Explain like I am new and show a simple fix."
+      - "Short, simple steps please."

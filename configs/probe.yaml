@@ -1,0 +1,11 @@
+model:
+  name: Qwen/Qwen2.5-3B-Instruct
+  torch_dtype: float16
+  device_map: auto
+  use_fast_tokenizer: true
+
+probe:
+  layer_idx: -1
+  pooling: last_token
+  max_samples_per_class: 8
+  output_dir: data/probe

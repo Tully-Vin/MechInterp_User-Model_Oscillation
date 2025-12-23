@@ -1,0 +1,43 @@
+photoshop:
+  - layers
+  - masks
+  - adjustment layer
+  - curves
+  - levels
+  - hue saturation
+  - white balance
+  - blend mode
+  - opacity
+  - clipping mask
+  - color balance
+  - match color
+  - selective color
+  - camera raw
+  - eyedropper
+  - neutralize
+  - feather
+  - refine edge
+  - decontaminate colors
+  - luminosity mask
+  - blend if
+  - smart object
+
+python:
+  - traceback
+  - stack trace
+  - typeerror
+  - keyerror
+  - nonetype
+  - dict
+  - list
+  - comprehension
+  - try
+  - except
+  - isinstance
+  - guard clause
+  - mutation
+  - call stack
+  - debugging
+  - pdb
+  - recursion
+  - time complexity

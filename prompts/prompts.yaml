@@ -1,0 +1,48 @@
+system: "You are a helpful assistant."
+
+domains:
+  photoshop:
+    base: |
+      I am compositing a subject from Photo A onto Photo B. The subject was shot under warm indoor light,
+      and the background is cool outdoor shade. The subject looks too yellow and brighter than the background.
+      I want the colors and lighting to match naturally without flattening skin texture.
+      How should I fix this in Photoshop?
+  python:
+    base: |
+      I'm getting a traceback in a small script. Explain what's wrong and show a fix.
+
+      def total_cost(items):
+          total = 0
+          for item in items:
+              total += item.get("price")
+          return total
+
+      items = [{"price": 10}, {"price": None}, {}]
+      print(total_cost(items))
+
+      Traceback: TypeError: unsupported operand type(s) for +=: 'int' and 'NoneType'
+
+conditions:
+  consistent_basic:
+    feedbacks:
+      - "Too technical. Keep it simple, minimal jargon, short steps."
+      - "Still too technical. Keep it simple, minimal jargon, short steps."
+      - "Again too technical. Keep it simple and practical."
+  consistent_technical:
+    feedbacks:
+      - "Too basic. Use proper terminology and be specific about tools, settings, or exact code changes."
+      - "Still too basic. Use precise terms and skip handholding."
+      - "Again too basic. Give the technical version."
+  oscillatory:
+    feedbacks:
+      - "Too technical. Keep it simple, minimal jargon."
+      - "Now it's too basic. Use proper terminology and be specific."
+      - "Too technical again. Keep it simple."
+  anchored:
+    anchor_prefix: |
+      I'm advanced but prefer plain language and a consistent depth. Please do not swing between overly technical
+      and overly basic.
+    feedbacks:
+      - "Too technical. Remember: advanced but plain language, consistent depth."
+      - "Too basic. Remember: advanced but plain language. Include key terms without a deep dive."
+      - "Too technical. Keep the same depth and plain language."
