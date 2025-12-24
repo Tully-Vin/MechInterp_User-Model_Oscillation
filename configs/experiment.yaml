@@ -13,8 +13,8 @@ generation:
   seed: 123
 
 experiment:
-  num_conversations: 10
+  num_conversations: 40
   domains: [photoshop, python]
   conditions: [consistent_basic, consistent_technical, oscillatory, anchored]
   output_dir: data/raw
-  max_feedback_turns: 3
+  max_feedback_turns: 6

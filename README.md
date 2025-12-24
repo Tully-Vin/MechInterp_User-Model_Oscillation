@@ -4,10 +4,10 @@ This workspace supports a small, time-boxed study of oscillations in conditional
 
 Quick start
 1) Install torch with CUDA (see docs/INSTALL.md)
-2) Run scripts/setup.ps1
-3) Run scripts/run_generation.ps1
-4) Run scripts/analyze.ps1
-5) Optional: run scripts/run_probe.ps1
+2) PowerShell: .\scripts\setup.ps1 (or CMD: scripts\setup.cmd)
+3) PowerShell: .\scripts\run_generation.ps1 (or CMD: scripts\run_generation.cmd)
+4) PowerShell: .\scripts\analyze.ps1 (or CMD: scripts\analyze.cmd)
+5) Optional: .\scripts\run_probe.ps1 (or scripts\run_probe.cmd)
 
 Project layout
 - configs/ : experiment configs

@@ -20,9 +20,15 @@ Conversation structure
 - Assistant response
 - User feedback 3
 - Assistant response
+- User feedback 4
+- Assistant response
+- User feedback 5
+- Assistant response
+- User feedback 6
+- Assistant response
 
 Default run size
-- 2 domains x 4 conditions x 10 conversations x 4 assistant turns
+- 2 domains x 4 conditions x 40 conversations x 7 assistant turns
 
 Primary outcomes
 - Oscillation index (technicality swings)

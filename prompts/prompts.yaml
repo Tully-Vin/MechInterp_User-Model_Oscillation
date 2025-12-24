@@ -28,16 +28,25 @@ conditions:
       - "Too technical. Keep it simple, minimal jargon, short steps."
       - "Still too technical. Keep it simple, minimal jargon, short steps."
       - "Again too technical. Keep it simple and practical."
+      - "Still too technical. Use plain language and the simplest steps."
+      - "Too technical. Avoid jargon and keep it brief."
+      - "Keep it simple. Short steps, no advanced terms."
   consistent_technical:
     feedbacks:
       - "Too basic. Use proper terminology and be specific about tools, settings, or exact code changes."
       - "Still too basic. Use precise terms and skip handholding."
       - "Again too basic. Give the technical version."
+      - "Too basic. Provide exact settings or the precise fix."
+      - "Be more technical. Use correct jargon and be concise."
+      - "Still too basic. Assume expertise and give the advanced version."
   oscillatory:
     feedbacks:
       - "Too technical. Keep it simple, minimal jargon."
       - "Now it's too basic. Use proper terminology and be specific."
       - "Too technical again. Keep it simple."
+      - "Too basic now. Use technical terms and be precise."
+      - "Too technical. Simplify and avoid jargon."
+      - "Too basic. Give the technical version."
   anchored:
     anchor_prefix: |
       I'm advanced but prefer plain language and a consistent depth. Please do not swing between overly technical
@@ -46,3 +55,6 @@ conditions:
       - "Too technical. Remember: advanced but plain language, consistent depth."
       - "Too basic. Remember: advanced but plain language. Include key terms without a deep dive."
       - "Too technical. Keep the same depth and plain language."
+      - "Too basic. Keep the same depth but include key terms."
+      - "Too technical. Use plain language but do not over-simplify."
+      - "Too basic. Be concise but include the technical core."

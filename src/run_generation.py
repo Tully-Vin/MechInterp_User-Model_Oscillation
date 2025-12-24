@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from tqdm import tqdm
 
 from io_utils import write_jsonl
 from prompt_utils import load_yaml, get_system_prompt, build_base_prompt
@@ -28,9 +29,11 @@ def generate_response(model, tokenizer, messages, gen_cfg):
     )
     device = next(model.parameters()).device
     inputs = inputs.to(device)
+    attention_mask = torch.ones_like(inputs)
     with torch.no_grad():
         outputs = model.generate(
             inputs,
+            attention_mask=attention_mask,
             max_new_tokens=gen_cfg["max_new_tokens"],
             temperature=gen_cfg["temperature"],
             top_p=gen_cfg["top_p"],
@@ -71,6 +74,13 @@ def main():
     output_path = output_dir / f"run_{run_id}.jsonl"
 
     records = []
+    total_generations = (
+        len(exp_cfg["domains"])
+        * len(exp_cfg["conditions"])
+        * exp_cfg["num_conversations"]
+        * (1 + exp_cfg["max_feedback_turns"])
+    )
+    pbar = tqdm(total=total_generations, desc="Generating", unit="gen")
     for domain in exp_cfg["domains"]:
         for condition in exp_cfg["conditions"]:
             feedbacks = prompts["conditions"][condition]["feedbacks"][: exp_cfg["max_feedback_turns"]]
@@ -86,11 +96,13 @@ def main():
 
                 assistant = generate_response(model, tokenizer, messages, gen_cfg)
                 messages.append({"role": "assistant", "content": assistant})
+                pbar.update(1)
 
                 for fb in feedbacks:
                     messages.append({"role": "user", "content": fb})
                     assistant = generate_response(model, tokenizer, messages, gen_cfg)
                     messages.append({"role": "assistant", "content": assistant})
+                    pbar.update(1)
 
                 convo_id = f"{domain}_{condition}_{i:03d}"
                 records.append({
@@ -103,8 +115,10 @@ def main():
                     "gen_config": gen_cfg,
                 })
 
+    pbar.close()
     write_jsonl(output_path, records)
     print(f"Wrote {len(records)} conversations to {output_path}")
+    print("Next: run scripts\\analyze.ps1 (or scripts\\analyze.cmd)")
 
 
 if __name__ == "__main__":
