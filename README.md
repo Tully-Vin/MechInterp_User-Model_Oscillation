@@ -8,6 +8,7 @@ Quick start
 3) PowerShell: .\scripts\run_generation.ps1 (or CMD: scripts\run_generation.cmd)
 4) PowerShell: .\scripts\analyze.ps1 (or CMD: scripts\analyze.cmd)
 5) Optional: .\scripts\run_probe.ps1 (or scripts\run_probe.cmd)
+6) Explorer UI: .\scripts\run_explorer.ps1 (or scripts\run_explorer.cmd)
 
 Project layout
 - configs/ : experiment configs

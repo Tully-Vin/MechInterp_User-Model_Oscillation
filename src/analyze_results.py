@@ -61,6 +61,65 @@ def compute_oscillation(df):
         })
     return pd.DataFrame(out)
 
+def feedback_directions(condition, n_steps):
+    if condition == "consistent_basic":
+        return np.full(n_steps, -1.0)
+    if condition == "consistent_technical":
+        return np.full(n_steps, 1.0)
+    return np.array([-1.0 if i % 2 == 0 else 1.0 for i in range(n_steps)])
+
+def compute_step_deltas(df):
+    rows = []
+    for (domain, condition, convo_id), grp in df.groupby(["domain", "condition", "conversation_id"]):
+        tech = grp.sort_values("turn_index")["technicality"].to_numpy()
+        if len(tech) < 2:
+            continue
+        deltas = np.diff(tech)
+        dirs = feedback_directions(condition, len(deltas))
+        for i, (delta, direction) in enumerate(zip(deltas, dirs)):
+            rows.append({
+                "domain": domain,
+                "condition": condition,
+                "conversation_id": convo_id,
+                "step_index": i + 1,
+                "delta": float(delta),
+                "direction": float(direction),
+                "directional_gain": float(delta * direction),
+            })
+    return pd.DataFrame(rows)
+
+def compute_conversation_stats(df, step_df):
+    rows = []
+    for (domain, condition, convo_id), grp in df.groupby(["domain", "condition", "conversation_id"]):
+        tech = grp.sort_values("turn_index")["technicality"].to_numpy()
+        if len(tech) < 2:
+            continue
+        tech_mean = float(np.mean(tech))
+        tech_std = float(np.std(tech, ddof=0))
+        tech_range = float(np.max(tech) - np.min(tech))
+        deltas = np.diff(tech)
+        mean_abs = float(np.mean(np.abs(deltas)))
+        flips = np.sum(np.sign(deltas[1:]) != np.sign(deltas[:-1]))
+        flip_rate = float(flips / max(1, len(deltas) - 1))
+        oi = mean_abs * (1.0 + flip_rate)
+        step_sub = step_df[(step_df["domain"] == domain) & (step_df["condition"] == condition) & (step_df["conversation_id"] == convo_id)]
+        gain_mean = float(step_sub["directional_gain"].mean()) if len(step_sub) else 0.0
+        gain_pos_rate = float((step_sub["directional_gain"] > 0).mean()) if len(step_sub) else 0.0
+        rows.append({
+            "domain": domain,
+            "condition": condition,
+            "conversation_id": convo_id,
+            "technicality_mean": tech_mean,
+            "technicality_std": tech_std,
+            "technicality_range": tech_range,
+            "mean_abs_delta": mean_abs,
+            "flip_rate": flip_rate,
+            "oscillation_index": oi,
+            "gain_mean": gain_mean,
+            "gain_pos_rate": gain_pos_rate,
+        })
+    return pd.DataFrame(rows)
+
 
 def plot_technicality(df, out_dir):
     for domain, grp in df.groupby("domain"):
@@ -74,6 +133,52 @@ def plot_technicality(df, out_dir):
         ax.legend()
         fig.tight_layout()
         fig.savefig(out_dir / f"technicality_{domain}.png", dpi=150)
+        plt.close(fig)
+
+def plot_trajectories(df, out_dir):
+    for (domain, condition), grp in df.groupby(["domain", "condition"]):
+        fig, ax = plt.subplots(figsize=(7, 4))
+        for convo_id, cgrp in grp.groupby("conversation_id"):
+            cgrp = cgrp.sort_values("turn_index")
+            ax.plot(cgrp["turn_index"], cgrp["technicality"], color="gray", alpha=0.25, linewidth=1)
+        med = grp.groupby("turn_index")["technicality"].median()
+        q25 = grp.groupby("turn_index")["technicality"].quantile(0.25)
+        q75 = grp.groupby("turn_index")["technicality"].quantile(0.75)
+        ax.plot(med.index, med.values, color="black", linewidth=2, label="median")
+        ax.fill_between(med.index, q25.values, q75.values, color="black", alpha=0.1, label="IQR")
+        ax.set_title(f"Trajectories ({domain}, {condition})")
+        ax.set_xlabel("Turn index")
+        ax.set_ylabel("Technicality")
+        ax.legend(loc="best")
+        fig.tight_layout()
+        fig.savefig(out_dir / f"trajectories_{domain}_{condition}.png", dpi=150)
+        plt.close(fig)
+
+def plot_expressivity(stats_df, out_dir):
+    for domain, grp in stats_df.groupby("domain"):
+        fig, ax = plt.subplots(figsize=(7, 4))
+        conditions = list(grp["condition"].unique())
+        data = [grp[grp["condition"] == c]["technicality_range"].values for c in conditions]
+        ax.boxplot(data, labels=conditions, showfliers=False)
+        ax.set_title(f"Expressivity range by condition ({domain})")
+        ax.set_xlabel("Condition")
+        ax.set_ylabel("Technicality range (max-min)")
+        fig.tight_layout()
+        fig.savefig(out_dir / f"expressivity_range_{domain}.png", dpi=150)
+        plt.close(fig)
+
+def plot_directional_gain(step_df, out_dir):
+    for domain, grp in step_df.groupby("domain"):
+        fig, ax = plt.subplots(figsize=(7, 4))
+        conditions = list(grp["condition"].unique())
+        data = [grp[grp["condition"] == c]["directional_gain"].values for c in conditions]
+        ax.boxplot(data, labels=conditions, showfliers=False)
+        ax.axhline(0, color="black", linewidth=1)
+        ax.set_title(f"Directional gain by condition ({domain})")
+        ax.set_xlabel("Condition")
+        ax.set_ylabel("Directional gain (positive = follows feedback)")
+        fig.tight_layout()
+        fig.savefig(out_dir / f"directional_gain_{domain}.png", dpi=150)
         plt.close(fig)
 
 
@@ -121,15 +226,23 @@ def main():
     tech_path = out_dir / f"technicality_{input_path.stem}.csv"
     df.to_csv(tech_path, index=False)
 
-    osc_df = compute_oscillation(df)
-    osc_path = out_dir / f"oscillation_{input_path.stem}.csv"
-    osc_df.to_csv(osc_path, index=False)
+    step_df = compute_step_deltas(df)
+    step_path = out_dir / f"step_deltas_{input_path.stem}.csv"
+    step_df.to_csv(step_path, index=False)
+
+    stats_df = compute_conversation_stats(df, step_df)
+    stats_path = out_dir / f"conversation_stats_{input_path.stem}.csv"
+    stats_df.to_csv(stats_path, index=False)
 
     plot_technicality(df, out_dir)
-    plot_oscillation(osc_df, out_dir)
+    plot_trajectories(df, out_dir)
+    plot_expressivity(stats_df, out_dir)
+    plot_directional_gain(step_df, out_dir)
+    plot_oscillation(stats_df, out_dir)
 
     print(f"Wrote {tech_path}")
-    print(f"Wrote {osc_path}")
+    print(f"Wrote {step_path}")
+    print(f"Wrote {stats_path}")
 
 
 if __name__ == "__main__":

@@ -19,3 +19,13 @@ Oscillation index per conversation
 Report
 - Both components and the combined index
 - Condition averages with standard error
+
+Expressivity (per conversation)
+- technicality_range = max(technicality) - min(technicality)
+- technicality_std = std(technicality)
+- These capture how much the model varies its response style within a conversation.
+
+Directional gain (per step)
+- direction = expected change (basic -> -1, technical -> +1)
+- directional_gain = delta * direction
+- Positive = follows feedback, negative = moves opposite
